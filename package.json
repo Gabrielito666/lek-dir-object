@@ -1,0 +1,11 @@
+{
+  "name": "lek-dir-object",
+  "version": "1.0.0",
+  "description": "'a little pajage for transform a directory to javascript object'",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gabriel Farías",
+  "license": "ISC"
+}
