@@ -1,5 +1,5 @@
-const processDirectory = require('./processDirectory');
-const readDirectory = require('./readDirectory');
-const processFile = require('./processFile');
+const readDirectories = require('./readDirectories');
+const writeJavascript = require('./writeJavascript');
+const constructTree = require('./constructTree');
 
-module.exports = { processDirectory, readDirectory, processFile };
+module.exports = { readDirectories, writeJavascript, constructTree };

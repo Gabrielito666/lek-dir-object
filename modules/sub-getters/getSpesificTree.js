@@ -1,22 +1,10 @@
-const { readDirectory, processDirectory, processFile } = require('../sub-modules');
-const getSpecificTree = async (directory, collectItems) => {
-    const tree = {};
-    const files = await readDirectory(directory);
+const { readDirectories, writeJavascript, constructTree } = require('../sub-modules');
 
-    await Promise.all(files.map(async file => {
-        if (file.isDirectory()) {
-            const result = await processDirectory(file, directory, getSpecificTree, collectItems);
-            if (result) {
-                Object.assign(tree, result);
-            }
-        } else {
-            if (collectItems.includes(file.name)) {
-                Object.assign(tree, await processFile(file, directory));
-            }
-        }
-    }));
 
-    return tree;
+const getSpesificTree = async (directory, collectItems) => {
+
+    const paths = await readDirectories(directory, collectItems);
+    return await writeJavascript(paths).then(() => constructTree(paths, directory));
+
 };
-
-module.exports = getSpecificTree;
+module.exports = getSpesificTree;

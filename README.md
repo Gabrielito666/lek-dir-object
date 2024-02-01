@@ -146,6 +146,9 @@ this second parameter by default uses the path of the file it is called from.
 
 if you don't want to work with an absolute and a relative path, you can directly set an absolute path as first parameter
 
+## 2.0.0
+
+version 2.0.0 works exactly the same for the user, but instead of importing the files dynamically, it creates a .js file for the implantations in the package itself. this is a bit slower, but it saves errors in applications that use webpack like the ones created with next.js. if this is not your case, you should use version 1.0.0.
 
 ## License
 Lek-DirObject is MIT licensed.
