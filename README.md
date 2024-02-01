@@ -150,5 +150,9 @@ if you don't want to work with an absolute and a relative path, you can directly
 
 version 2.0.0 works exactly the same for the user, but instead of importing the files dynamically, it creates a .js file for the implantations in the package itself. this is a bit slower, but it saves errors in applications that use webpack like the ones created with next.js. if this is not your case, you should use version 1.0.0.
 
+In version 2.0.1 there is an "improvement" that involves certain risks...
+
+when you only manage one instance of lek-dir-object the version 2.0.0 works correctly. however not if you instantiate more than once. in version 2.0.1 this is fixed with an id... you must pass as third parameter (and only as third parameter) a fixed and different one to each instance. this way the instances will be recognized and the paths will be managed correctly... do not change the id or you will accumulate a lot of text in the package. anyway you can clean the package using `npm run clear-lek-dir-object-modules`.
+
 ## License
 Lek-DirObject is MIT licensed.
