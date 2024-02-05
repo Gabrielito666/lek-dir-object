@@ -2,6 +2,9 @@
 
 `Lek-DirObject` is a Node.js module for creating a directory tree structure of JavaScript files. It supports two modes: default and specific.
 
+Version 3.0.0 of lek-dir-object uses an improved system that allows webpack compatibility and the creation of multiple directory trees simultaneously.
+
+
 ## Installation
 
 To install `Lek-DirObject`, use the following command:
@@ -12,11 +15,26 @@ npm install lek-dir-object
 
 ## Usage
 
-`Lek-DirObject` can be used in two different modes: default and specific.
+Then you must import and instantiate the master instance of lek-dir-object. this instance must be instantiated only once.
+
+then you can create trees from this instance with the getTree method.
+
+```javascript
+const lekDirObject = require('lek-dir-object');
+const lek_dir_object_master = new lekDirObject();
+
+const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
+
+```
+who knows the previous versions of lek-dir-object will find in this method the analogue to the old versions. the method receives a relative path and an absolute path to be created correctly. the second path is optional and if omitted it will take as root path the file from which the master instance is instantiated. i recommend to always put something __dirname as second parameter.
+
+the Tree instance created with createTree has a .tree property. this property contains a promise that is resolved once the master instance is initialized. so when you have all your instances configured as you wish, use the initialize() method of the master instance and the tables will be resolved. ergo you will be able to access your tree from the tree with a simple await.
+
+Your tree can be used in two different modes: default and specific.
 
 ### Default Mode
 
-In default mode, `Lek-DirObject` creates a tree structure that includes all JavaScript files in the specified directory and its subdirectories.
+In default mode, your tree creates a tree structure that includes all JavaScript files in the specified directory and its subdirectories.
 
 Example directory structure:
 
@@ -41,14 +59,15 @@ Example directory structure:
 ```javascript
 
 (async function(){
-    const LekDirObject = require('lek-dir-object');
-    const lekDir = new LekDirObject('/rootPath');
+    const lekDirObject = require('lek-dir-object');
+    const lek_dir_object_master = new lekDirObject();
+    const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
 
-    await lekDir.initialize()
+    lek_dir_object_master.initialize();
 
-    const myTree = lekDir.tree;
+    const theTree = await my_tree.tree;
     
-    console.log(myTree);
+    console.log(theTree);
 })();
 
 
@@ -100,15 +119,17 @@ Example usage:
 ```javascript
 
 (async function(){
-    const LekDirObject = require('lek-dir-object');
-    const lekDir = new LekDirObject('/rootPath');
+    const lekDirObject = require('lek-dir-object');
+    const lek_dir_object_master = new lekDirObject();
+    const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
+    
+    my_tree.setSpesificMode(['elements', 'options'])
 
-    lekDir.setSpesificMode(['elements', 'options'])
-    await lekDir.initialize();
+    lek_dir_object_master.initialize();
 
-    const myTree = lekDir.tree;
-
-    console.log(myTree)
+    const theTree = await my_tree.tree;
+    
+    console.log(theTree);
 })();
 
 //the tree is an object like:
@@ -128,6 +149,7 @@ const tree = {
 
 ```
 
+
 ### Spesifications
 
 #### Exports
@@ -145,14 +167,6 @@ then the application will resolve the path "/home/my_username/my_project/my_tree
 this second parameter by default uses the path of the file it is called from.
 
 if you don't want to work with an absolute and a relative path, you can directly set an absolute path as first parameter
-
-## 2.0.0
-
-version 2.0.0 works exactly the same for the user, but instead of importing the files dynamically, it creates a .js file for the implantations in the package itself. this is a bit slower, but it saves errors in applications that use webpack like the ones created with next.js. if this is not your case, you should use version 1.0.0.
-
-In version 2.0.1 there is an "improvement" that involves certain risks...
-
-when you only manage one instance of lek-dir-object the version 2.0.0 works correctly. however not if you instantiate more than once. in version 2.0.1 this is fixed with an id... you must pass as third parameter (and only as third parameter) a fixed and different one to each instance. this way the instances will be recognized and the paths will be managed correctly... do not change the id or you will accumulate a lot of text in the package. anyway you can clean the package using `npm run clear-lek-dir-object-modules`.
 
 ## License
 Lek-DirObject is MIT licensed.
