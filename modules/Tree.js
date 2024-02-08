@@ -1,32 +1,39 @@
 const path = require('path');
 const { constructTree, readDirectories } = require('./sub-modules');
 
-class Tree{
-    constructor(route, root){
+const verifiqueJS = item => item.endsWith(".js") ? item : (item + '.js')
 
+class Tree{
+    constructor(route, root, spesificItems = false, onCreate){
+
+        this.pathsAreReady = false;
         this.rootPath = root ? root : (module.parent.filename ? path.dirname(module.parent.filename) : '.');
-        this.mode = 'default';
-        this.collectItems = false;
-        this.directory = path.isAbsolute( route ) ? route : path.resolve( this.rootPath, route );
+
+        if(spesificItems)
+        {
+            if(Array.isArray) this.collectItems = spesificItems.map(verifiqueJS);
+            else this.collectItems = verifiqueJS(spesificItems);
+        }else
+        {
+            this.collectItems = false
+        }
+        
+        this.directory = path.isAbsolute( route ) ? route : path.resolve(this.rootPath, route);
         this.tree = new Promise((resolve, reject) => {
             this.resolve = resolve;
             this.reject = reject;
-        })
-    }
-    setSpesificMode(collectItems){
-        this.mode = 'specific';
-        this.collectItems = collectItems.map(ci => `${ ci }.js`);
-        return this;
-    }
-    setDefaultMode(){
-        this.mode = 'default';
-        this.collectItems = false;
-        return this;
-    }
-    async getPaths(){
-        this.paths = await readDirectories(this.directory, this.collectItems);
-        return this.paths;
+        });
+
+        this.tree.then(tree => { onCreate(tree) });
     };
-    constructTree(){ this.resolve(constructTree(this.paths, this.directory)) };
+
+    async getPaths(event){ 
+        this.paths = await readDirectories(this.directory, this.collectItems);
+        this.pathsAreReady = true;
+        event();
+    };
+    constructTree(){
+        this.resolve(constructTree(this.paths, this.directory));
+    };
 }
 module.exports = Tree;

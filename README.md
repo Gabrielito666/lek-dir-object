@@ -2,7 +2,7 @@
 
 `Lek-DirObject` is a Node.js module for creating a directory tree structure of JavaScript files. It supports two modes: default and specific.
 
-Version 3.0.0 of lek-dir-object uses an improved system that allows webpack compatibility and the creation of multiple directory trees simultaneously.
+Version 4.0.0 of lek-dir-object uses an improved system that allows webpack compatibility and the creation of multiple directory trees simultaneously.
 
 
 ## Installation
@@ -15,22 +15,44 @@ npm install lek-dir-object
 
 ## Usage
 
-Then you must import and instantiate the master instance of lek-dir-object. this instance must be instantiated only once.
+import the main function with require and then run it to get the createTree function. then with this function you can create trees quite freely.
 
-then you can create trees from this instance with the getTree method.
+to the createTree function you pass an object
+
+route, root, onCreate, spesificItems
+
+route is a relative path, and root is an absolute path... i recommend passing __dirname to root and passing the address of the folder you want to scan from the current directory to route. to spesificOptions you can pass an array with the name of the .js files you want to scan. if you don't pass anything, the default mode that scans all .js files will be used.
+
+onCreate is optional, it supports a function that will be executed once the tree has been created.
 
 ```javascript
 const lekDirObject = require('lek-dir-object');
-const lek_dir_object_master = new lekDirObject();
+const createTree = lekDirObject();
 
-const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
+createTree({
+    route : './root/of/my/tree/folder',
+    root : __dirname,
+    spesificItems : [ 'nameFile.js' ]
+    onCreate : tree => { console.log(tree) }
+});
 
 ```
-who knows the previous versions of lek-dir-object will find in this method the analogue to the old versions. the method receives a relative path and an absolute path to be created correctly. the second path is optional and if omitted it will take as root path the file from which the master instance is instantiated. i recommend to always put something __dirname as second parameter.
 
-the Tree instance created with createTree has a .tree property. this property contains a promise that is resolved once the master instance is initialized. so when you have all your instances configured as you wish, use the initialize() method of the master instance and the tables will be resolved. ergo you will be able to access your tree from the tree with a simple await.
+createTree returns the promise of the tree so you can access the tree through onCreate or using a simple await
 
-Your tree can be used in two different modes: default and specific.
+```javascript
+const lekDirObject = require('lek-dir-object');
+const createTree = lekDirObject();
+
+const my_tree = await createTree({
+    route : './root/of/my/tree/folder',
+    root : __dirname,
+    spesificItems : [ 'nameFile.js' ]
+});
+
+console.log(my_tree);
+
+```
 
 ### Default Mode
 
@@ -60,14 +82,10 @@ Example directory structure:
 
 (async function(){
     const lekDirObject = require('lek-dir-object');
-    const lek_dir_object_master = new lekDirObject();
-    const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
-
-    lek_dir_object_master.initialize();
-
-    const theTree = await my_tree.tree;
+    const createTree = lekDirObject();
+    const my_tree = await createTree({ route : './root/of/my/tree/folder', root : __dirname });
     
-    console.log(theTree);
+    console.log(my_tree);
 })();
 
 
@@ -120,16 +138,14 @@ Example usage:
 
 (async function(){
     const lekDirObject = require('lek-dir-object');
-    const lek_dir_object_master = new lekDirObject();
-    const my_tree = lek_dir_object_master.createTree('./root/of/my/tree/folder', __dirname);
+    const createTree = lekDirObject();
+    const my_tree = await createTree({
+        route : './root/of/my/tree/folder',
+        root : __dirname,
+        spesificItems : ['elements', 'options'] //can end with .js or not
+    });
     
-    my_tree.setSpesificMode(['elements', 'options'])
-
-    lek_dir_object_master.initialize();
-
-    const theTree = await my_tree.tree;
-    
-    console.log(theTree);
+    console.log(my_tree);
 })();
 
 //the tree is an object like:
@@ -149,24 +165,10 @@ const tree = {
 
 ```
 
-
 ### Spesifications
 
 #### Exports
 In the tree of nested folders you are going to create. be sure to export what you want to find in the resulting object and export it with module.exports since the package was conceived to receive commonJs.
-
-#### Instance parameters
-
-The constructor of the instantiation accepts two parameters... the first one you already know: the folder to analyze to construct the tree object. The second parameter is optional but can be useful. it represents the relative directory from which the first parameter will be read.
-
-e.g:
-
-if the first parameter is "./my_tree" and the second is "/home/my_username/my_project/"
-then the application will resolve the path "/home/my_username/my_project/my_tree".
-
-this second parameter by default uses the path of the file it is called from.
-
-if you don't want to work with an absolute and a relative path, you can directly set an absolute path as first parameter
 
 ## License
 Lek-DirObject is MIT licensed.
